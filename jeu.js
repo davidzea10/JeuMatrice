@@ -1,7 +1,7 @@
 /**
  * Jeu Matrice - Déplacement diagonal
  * Règles : G-H (i-1,j-1), G-B (i+1,j-1), D-H (i-1,j+1), D-B (i+1,j+1)
- * Grille m×n = 6×6. Déplacement uniquement en diagonale.
+ * Grille m×n choisie par l'utilisateur (défaut 6×6, max 10×10).
  */
 
 const zoneJeu = document.getElementById('zone-jeu');
@@ -9,13 +9,18 @@ const ecranAccueil = document.getElementById('ecran-accueil');
 const valeurIJ = document.getElementById('valeur-ij');
 const affichagePosition = document.getElementById('affichage-position');
 const messageDeborde = document.getElementById('message-deborde');
+const inputM = document.getElementById('input-m');
+const inputN = document.getElementById('input-n');
+const messageErreurTaille = document.getElementById('message-erreur-taille');
 const ctx = zoneJeu.getContext('2d');
 
-// Matrice m×n (6×6)
-const M = 6;
-const N = 6;
+const TAILLE_MAX = 10;
 
-// Position actuelle de la pièce (i, j). i = ligne (0 en haut), j = colonne (0 à gauche)
+// Matrice m×n (définie au démarrage de la partie)
+let M = 6;
+let N = 6;
+
+// Position actuelle de la pièce (i, j)
 let i = 3;
 let j = 3;
 
@@ -133,12 +138,26 @@ function dessiner() {
 }
 
 function demarrerPartie() {
+  const mVal = parseInt(inputM.value, 10);
+  const nVal = parseInt(inputN.value, 10);
+  messageErreurTaille.classList.add('cache');
+  messageErreurTaille.textContent = '';
+
+  if (Number.isNaN(mVal) || Number.isNaN(nVal) || mVal < 1 || nVal < 1 || mVal > TAILLE_MAX || nVal > TAILLE_MAX) {
+    messageErreurTaille.textContent = `m et n doivent être entre 1 et ${TAILLE_MAX}.`;
+    messageErreurTaille.classList.remove('cache');
+    return;
+  }
+
+  M = mVal;
+  N = nVal;
+  i = Math.floor(M / 2);
+  j = Math.floor(N / 2);
+
   enCours = true;
   deborde = false;
   affichagePosition.classList.remove('deborde');
   messageDeborde.textContent = '';
-  i = 3;
-  j = 3;
   valeurIJ.textContent = `(${i}, ${j})`;
   ecranAccueil.classList.add('cache');
   document.getElementById('zone-grille').classList.remove('cache');
@@ -154,6 +173,20 @@ document.getElementById('btn-dh').addEventListener('click', () => deplacerDiagon
 document.getElementById('btn-db').addEventListener('click', () => deplacerDiagonal('db'));
 
 document.getElementById('bouton-jouer').addEventListener('click', demarrerPartie);
+
+document.getElementById('bouton-aide').addEventListener('click', () => {
+  document.getElementById('page-aide').classList.remove('cache');
+});
+document.getElementById('fermer-aide').addEventListener('click', () => {
+  document.getElementById('page-aide').classList.add('cache');
+});
+
+document.getElementById('bouton-apropos').addEventListener('click', () => {
+  document.getElementById('page-apropos').classList.remove('cache');
+});
+document.getElementById('fermer-apropos').addEventListener('click', () => {
+  document.getElementById('page-apropos').classList.add('cache');
+});
 
 // Tactile : swipe diagonal sur la grille
 const SEUIL_SWIPE = 35;
