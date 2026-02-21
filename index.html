@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Jeu Matrice - Déplacement diagonal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="conteneur-jeu">
+    <!-- Écran d'accueil -->
+    <div id="ecran-accueil">
+      <h1>Jeu Matrice</h1>
+      <p class="sous-titre">Déplace la pièce en diagonale</p>
+      <div class="regles-accueil">
+        <p><strong>Règles :</strong></p>
+        <p>G-H (Gauche-Haut) : i-1, j-1</p>
+        <p>G-B (Gauche-Bas) : i+1, j-1</p>
+        <p>D-H (Droite-Haut) : i-1, j+1</p>
+        <p>D-B (Droite-Bas) : i+1, j+1</p>
+        <p>Grille 6×6. Uniquement en diagonale.</p>
+      </div>
+      <button type="button" id="bouton-jouer">Jouer</button>
+    </div>
+
+    <!-- Zone de jeu : carré (grille 6×6, cases carrées) -->
+    <div id="zone-grille" class="cache">
+      <canvas id="zone-jeu"></canvas>
+    </div>
+
+    <!-- Position actuelle (i, j) + message débordement -->
+    <div id="interface-jeu" class="cache">
+      <div id="affichage-position">
+        <span>Position :</span>
+        <span id="valeur-ij">(3, 3)</span>
+        <div id="message-deborde"></div>
+      </div>
+    </div>
+
+    <!-- Boutons de déplacement diagonal (ordinateur) -->
+    <div id="boutons-deplacement" class="cache">
+      <div class="ligne-boutons">
+        <button type="button" class="bouton-diag" id="btn-gh" title="Gauche-Haut">G-H</button>
+        <button type="button" class="bouton-diag" id="btn-dh" title="Droite-Haut">D-H</button>
+      </div>
+      <div class="ligne-boutons">
+        <button type="button" class="bouton-diag" id="btn-gb" title="Gauche-Bas">G-B</button>
+        <button type="button" class="bouton-diag" id="btn-db" title="Droite-Bas">D-B</button>
+      </div>
+      <p class="indication-tactile">Sur mobile : glisse en diagonale sur la grille</p>
+    </div>
+  </div>
+
+  <script src="jeu.js"></script>
+</body>
+</html>
