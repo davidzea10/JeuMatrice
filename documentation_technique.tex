@@ -1,0 +1,150 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\geometry{margin=2.5cm}
+\title{Jeu Matrice --- Résumé technique}
+\author{Déplacement diagonal (grille m$\times$n)}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Présentation du projet}
+%==============================================================================
+
+Le \textbf{Jeu Matrice} est une application web (HTML, CSS, JavaScript) dans laquelle une pièce se déplace \emph{uniquement en diagonale} sur une grille. L'utilisateur choisit la taille de la grille (m lignes $\times$ n colonnes, par défaut 6$\times$6, maximum 10$\times$10), puis déplace la pièce soit avec des boutons (ordinateur), soit par un geste de glissement diagonal sur l'écran (téléphone).
+
+%==============================================================================
+\section{Représentation de la matrice}
+%==============================================================================
+
+\subsection{Dimensions}
+
+La grille est une \textbf{matrice} de dimensions $m \times n$ :
+\begin{itemize}[noitemsep]
+  \item $m$ : nombre de \textbf{lignes} (indice $i$, de $0$ à $m-1$) ;
+  \item $n$ : nombre de \textbf{colonnes} (indice $j$, de $0$ à $n-1$).
+\end{itemize}
+
+Contraintes : $1 \leq m \leq 10$ et $1 \leq n \leq 10$. Les valeurs sont saisies sur l'écran d'accueil et validées au clic sur \emph{Jouer}. Si $m$ ou $n$ est hors de cet intervalle (ou non numérique), un message d'erreur s'affiche et la partie ne démarre pas.
+
+\subsection{Position de la pièce}
+
+La position est donnée par un couple d'indices $(i, j)$ :
+\begin{itemize}[noitemsep]
+  \item $i$ : numéro de \textbf{ligne} (0 = première ligne en haut) ;
+  \item $j$ : numéro de \textbf{colonne} (0 = première colonne à gauche).
+\end{itemize}
+
+Position initiale au démarrage d'une partie : la pièce est placée au \textbf{centre} de la grille :
+\[
+  (i_0, j_0) = \left( \lfloor m/2 \rfloor,\, \lfloor n/2 \rfloor \right).
+\]
+
+%==============================================================================
+\section{Règles de déplacement}
+%==============================================================================
+
+Les déplacements sont \textbf{uniquement diagonaux} : à chaque action, la pièce change à la fois de ligne et de colonne. Quatre directions sont possibles :
+
+\begin{center}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Code} & \textbf{Sens}        & $\Delta i$ & $\Delta j$ \\
+\midrule
+G-H & Gauche-Haut  & $-1$ & $-1$ \\
+G-B & Gauche-Bas   & $+1$ & $-1$ \\
+D-H & Droite-Haut  & $-1$ & $+1$ \\
+D-B & Droite-Bas   & $+1$ & $+1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Formules de mise à jour :
+\begin{align*}
+  \text{G-H} &: (i,\, j) \mapsto (i-1,\, j-1) \\
+  \text{G-B} &: (i,\, j) \mapsto (i+1,\, j-1) \\
+  \text{D-H} &: (i,\, j) \mapsto (i-1,\, j+1) \\
+  \text{D-B} &: (i,\, j) \mapsto (i+1,\, j+1)
+\end{align*}
+
+\subsection{Conditions aux bords}
+
+Un déplacement est \textbf{refusé} si la nouvelle position sort de la grille :
+\[
+  i_{\text{new}} \notin [0, m-1] \quad \text{ou} \quad j_{\text{new}} \notin [0, n-1].
+\]
+
+Dans ce cas, la position $(i, j)$ ne change pas et l'application signale un \textbf{débordement} (affichage en rouge, message « Hors limites ! », puis retour à l'affichage normal après un court délai).
+
+%==============================================================================
+\section{Affichage : canvas et cases carrées}
+%==============================================================================
+
+La grille est dessinée dans un élément \texttt{canvas} (HTML5). Pour que les cases soient \textbf{carrées}, le canvas est redimensionné en un carré de côté $c = \min(L, H)$, où $L$ et $H$ sont la largeur et la hauteur de la zone réservée à la grille. On pose ensuite :
+\[
+  \texttt{largeurCellule} = \frac{c}{n}, \qquad \texttt{hauteurCellule} = \frac{c}{m}.
+\]
+
+En JavaScript, \texttt{zoneJeu.width} et \texttt{zoneJeu.height} sont mis à $c$, puis les traits de la grille et le cercle représentant la pièce sont tracés à partir de $(i, j)$ et de ces dimensions. La pièce est dessinée au centre de la case $(i, j)$ ; en cas de débordement, elle est affichée en rouge pendant un court instant.
+
+%==============================================================================
+\section{Entrées : ordinateur et tactile}
+%==============================================================================
+
+\subsection{Ordinateur}
+
+Quatre boutons (G-H, G-B, D-H, D-B) sont affichés sous la grille. Un clic sur l'un d'eux déclenche l'appel à la fonction \texttt{deplacerDiagonal(direction)} avec la direction correspondante. Un clic = un déplacement d'une case en diagonale (si le déplacement est autorisé).
+
+\subsection{Tactile (téléphone)}
+
+Sur écran tactile, le déplacement est déclenché par un \textbf{geste de glissement} (swipe) sur la zone du canvas.
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{touchstart} : au doigt posé, on enregistre les coordonnées de départ $(x_0, y_0)$ via \texttt{touches[0].clientX} et \texttt{touches[0].clientY}.
+  \item \textbf{touchend} : au doigt levé, on lit les coordonnées de fin $(x_1, y_1)$ via \texttt{changedTouches[0]}.
+  \item On calcule $\Delta x = x_1 - x_0$ et $\Delta y = y_1 - y_0$.
+  \item Pour que le geste soit pris en compte :
+  \begin{itemize}[noitemsep]
+    \item $|\Delta x| \geq 35$ px et $|\Delta y| \geq 35$ px (seuil minimal) ;
+    \item le geste doit être suffisamment diagonal : $|\Delta x|$ et $|\Delta y|$ ne doivent pas être trop déséquilibrés (conditions du type $|\Delta x| \geq 0{,}5\,|\Delta y|$ et $|\Delta y| \geq 0{,}5\,|\Delta x|$).
+  \end{itemize}
+  \item La direction du déplacement est déduite des \textbf{signes} de $\Delta x$ et $\Delta y$ :
+\end{enumerate}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+$\Delta x < 0$, $\Delta y < 0$ & G-H (gauche-haut) \\
+$\Delta x > 0$, $\Delta y < 0$ & D-H (droite-haut) \\
+$\Delta x < 0$, $\Delta y > 0$ & G-B (gauche-bas) \\
+$\Delta x > 0$, $\Delta y > 0$ & D-B (droite-bas) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Un seul geste valide provoque un seul appel à \texttt{deplacerDiagonal}, donc un déplacement d'une case. \texttt{preventDefault()} sur les événements touch permet d'éviter le défilement de la page.
+
+%==============================================================================
+\section{Structure de l'application}
+%==============================================================================
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Écran d'accueil} : saisie de $m$ et $n$, boutons Aide, À propos, Jouer. Validation de $m$, $n$ $\in [1, 10]$ avant démarrage.
+  \item \textbf{Overlays} : pages Aide (règles des 4 directions, usage boutons et tactile) et À propos (auteur).
+  \item \textbf{Zone de jeu} : canvas (grille + pièce), affichage de la position $(i, j)$, message « Hors limites » si débordement, boutons G-H, G-B, D-H, D-B.
+\end{itemize}
+
+Le dessin est mis à jour après chaque déplacement (et après redimensionnement de la fenêtre). La grille et la pièce sont entièrement gérées en JavaScript (calcul des coordonnées à partir de $(i, j)$, \texttt{largeurCellule}, \texttt{hauteurCellule}).
+
+\end{document}

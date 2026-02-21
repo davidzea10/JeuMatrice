@@ -1,0 +1,12 @@
+\babel@toc {french}{}\relax 
+\contentsline {section}{\numberline {1}Présentation du projet}{2}{section.1}%
+\contentsline {section}{\numberline {2}Représentation de la matrice}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Dimensions}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Position de la pièce}{2}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Règles de déplacement}{2}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Conditions aux bords}{2}{subsection.3.1}%
+\contentsline {section}{\numberline {4}Affichage : canvas et cases carrées}{3}{section.4}%
+\contentsline {section}{\numberline {5}Entrées : ordinateur et tactile}{3}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Ordinateur}{3}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Tactile (téléphone)}{3}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Structure de l'application}{3}{section.6}%
